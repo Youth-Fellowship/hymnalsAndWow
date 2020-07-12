@@ -4,7 +4,9 @@ import { View, TouchableOpacity, Text, FlatList, StyleSheet, ActivityIndicator} 
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ApiService from '../apiservice';
 
-import { StyledTextRegular, StyledTextMedium, StyledTextBold } from '../components/StyledText';
+import { StyledTextBold } from '../components/StyledText';
+import allHymns from '../hymnals';
+
 
 export default class AccordFt extends Component{
 // rev;
@@ -31,11 +33,11 @@ export default class AccordFt extends Component{
           </View>
         )}
             {
-                this.state.loaded && 
+                this.state.loaded &&
                 <View style={{}}>
                     <FlatList
                         data={this.state.data}
-                        keyExtractor={(item) =>  item.no.toString()}
+                        keyExtractor={(item) =>  `${item.no.toString()}_${item.title.replace(/ /g, "_")}_${Math.random}`}
                         scrollEnabled={true}
                         renderItem={({item}) =>
                         <View>
@@ -60,26 +62,18 @@ export default class AccordFt extends Component{
   onClick=(no)=>{
     const result = this.state.data.filter(hymn => hymn.no == no);
     const {navigate} = this.props.navigate
-     navigate('HymnContent', {data:result})
-    // alert(`work in progress ${index} and ${this.state.page}`);
+    navigate('HymnContent', {data:result})
   }
 
-  async getContent(val){
+  getContent(val){
+    val = val.replace(/ /g, "");
+      const result = allHymns[val];
+    console.log(result);
     this.setState({
-      loading: !this.state.loading,
+      loaded:!this.state.loaded,
+      loading:false,
+      data: result
     });
-    try {
-      const apiService = new ApiService();
-      const result = await apiService.read(`https://shrouded-coast-84333.herokuapp.com/hymns/?category=${val}`);
-      this.setState({
-        loaded:!this.state.loaded,
-        loading:!this.state.loading,
-        data: result.hymns,
-      });
-    }
-      catch (error) {
-        console.log(error);
-      }
   }
 
   toggleExpand=(val)=>{
@@ -88,14 +82,13 @@ export default class AccordFt extends Component{
     this.setState({
       expanded: !this.state.expanded,
     });
-     if (!this.state.loaded) {
+    if (!this.state.loaded) {
       this.getContent(val);
     }else{
       this.setState({
         loaded: !this.state.loaded,
       });
     }
-    // console.log('expand', this.state.expanded)
   };
 }
 

@@ -1,24 +1,19 @@
 
 import React, {Component} from 'react';
-import { StyleSheet, View, SafeAreaView, FlatList, Text, ActivityIndicator} from 'react-native';
-import AccordFt from './AccordFt';
-import ApiService from '../apiservice';
+import { StyleSheet, View, SafeAreaView, FlatList, ActivityIndicator} from 'react-native';
+import { StyledTextBold } from '../components/StyledText';
 
-import { StyledTextBold, StyledTextRegular } from '../components/StyledText';
+import AccordFt from './AccordFt';
+import categories from '../hymnals/categories';
+
 
 export default class AccordFtUse extends Component {
-  allMenu=[];
-
-async componentDidMount() {
-  try {
-    const apiService = new ApiService();
-    const result = await apiService.read("https://shrouded-coast-84333.herokuapp.com/hymns/categories");
-    this.setState({
-      loading: false,
-      menu: result.categories
-     })
-  }
-    catch (error) {
+  async componentDidMount() {
+    try {
+      this.setState({
+        loading: false,
+      })
+    } catch (error) {
       console.log(error);
     }
   }
@@ -26,16 +21,14 @@ async componentDidMount() {
   constructor(props) {
     super(props);
     this.state = {
-      menu:[],
       loading: true,
-
       /****prop for the expand */
       expanded: false,
       loaded:false,
       loadingEx:false,
     };
     this.rev = React.createRef();
-}
+  }
 
 
   render() {
@@ -55,6 +48,7 @@ async componentDidMount() {
   }
 
   Item({ item }) {
+
     return (
       <View>
         <StyledTextBold style={styles.itemStyle}>{item.title}</StyledTextBold>
@@ -66,8 +60,8 @@ async componentDidMount() {
     if(!this.state.loading){
     return (
         <View style={styles.categoryStyle}>
-         <FlatList
-          data={this.state.menu}
+        <FlatList
+          data={categories}
           renderItem={(item)=> this.renderAccordians(item)}
           keyExtractor={(item) => item}
           style={ {paddingTop: 10} }
@@ -88,11 +82,11 @@ async componentDidMount() {
             navigate={this.props.navigate}
         />
     )
-}
+  }
 
-toggleClick(val){
-console.log('st', this.rev, val)
-}
+  toggleClick(val){
+    console.log('st', this.rev, val)
+  }
 }
 
 
